@@ -28,3 +28,7 @@ Requirements
 % YAWS api location
 
 -include("/usr/local/lib/yaws/include/yaws_api.hrl").
+
+
+see ypg.erl repo to see how to view individual print jobs
+see pgprt to scrape printer total jobs every N seconds and put result in DB
