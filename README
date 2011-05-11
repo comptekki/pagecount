@@ -1,0 +1,30 @@
+pagecount.erl - version 1.0
+==============
+
+erlang based utility to report daily totals for pages printed to a printer
+
+Requirements
+==============
+1. erlang
+2. postgresql
+3. https://github.com/wg/epgsql.git 
+4. create pagecount.hrl with information below filled out properly:
+
+% printer info
+
+-define(MAGIC_LINE_NUMBER, 208).
+
+% for brother printer
+
+-define(URL, "http://192.168.0.1/printer/configu.html?autoref=0&weblang=0").
+
+% postgres connection info
+
+-define(HOST, "localhost").
+-define(DB, "").
+-define(USERNAME, "").
+-define(PASSWORD, "").
+
+% YAWS api location
+
+-include("/usr/local/lib/yaws/include/yaws_api.hrl").
