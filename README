@@ -31,4 +31,4 @@ Requirements
 
 
 see ypg.erl repo to see how to view individual print jobs
-see pgprt repo to scrape printer total jobs every N seconds and put result in DB
+see pgprt repo to scrape printer jobs every N seconds and put result in DB
