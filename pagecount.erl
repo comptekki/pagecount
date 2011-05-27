@@ -11,15 +11,23 @@
 %-define(STARTCOUNT, [5966, {2010,5,11}]).
 -define(STARTCOUNT, {<<"13994">>, <<"2011-02-01">>}).
 
--define(QUERY,
+-define(QUERY0,
 "select
 MAX(page_count_count) as day_max, page_count_pdate
 from page_count
 group by page_count_pdate order by page_count_pdate;"
 ).
 
+-define(DAY_COUNT_QUERY,
+"select MAX(page_count_count)-MIN(page_count_count)+1 as day_count, page_count_pdate
+from page_count
+group by page_count_pdate order by page_count_pdate;"
+).
+
+-define(MAX_PAGE_COUNT_QUERY, "select max(page_count_count) from page_count;").
+
 out(_A) ->
-	Rows=do_query(?QUERY),
+	Rows=do_query(?DAY_COUNT_QUERY),
 	Headers=["Page<br>Count", "Date"],
 	{ehtml,
 		[
@@ -36,7 +44,7 @@ out(_A) ->
           			[
           			{th, [], X} || X <- Headers
          			]
-         		} | d(Rows,?STARTCOUNT)] ++
+         		} | d(Rows)] ++
 				{tr, [],
           			[
          			{th, [{colspan,"3"}], integer_to_list(get_tot(Rows)) ++ " - Total Pages Printed<br>(Cartridge)"}
@@ -44,7 +52,7 @@ out(_A) ->
          		}] ++
 				{tr, [],
           			[
-         			{th, [{colspan,"3"}], tpp(Rows) ++ " - Total Pages Printed<br>(Printer)"}
+         			{th, [{colspan,"3"}], tpp() ++ " - Total Pages Printed<br>(Printer)"}
          			]
          		}
 			}
@@ -52,9 +60,8 @@ out(_A) ->
 		]
 	}.
 
-tpp(Rows) ->
-	LastRow = lists:last(Rows),
-	{Tot,_} = LastRow,
+tpp() ->
+	[{Tot}] = do_query(?MAX_PAGE_COUNT_QUERY),
 	binary_to_list(Tot).
 
 do_query(Sp) ->
@@ -64,35 +71,28 @@ do_query(Sp) ->
 	Res.
 	
 get_tot(Rows) ->
-	lists:foldl(fun(X, Sum) -> X + Sum end, 0, mk_count_lst(Rows,?STARTCOUNT)).
+	lists:foldl(fun(X, Sum) -> X + Sum end, 0, mk_count_lst(Rows)).
 
-d([First|Rest], Prev) ->
-	[mk_row(First,Prev) | d(Rest, First)];
-d([],_) -> [].
+d([H|T]) ->
+	[mk_row(H) | d(T)];
+d([]) -> [].
 	
-mk_row(First,Prev) ->
+mk_row(First) ->
 	{FcountB,FdateB} = First,
 	Fcount=list_to_integer(binary_to_list(FcountB)),
 	Fdate=binary_to_list(FdateB),
-	{PcountB, _} = Prev,
-	Pcount=list_to_integer(binary_to_list(PcountB)),
-%Pcount=0,
-%	io:format("~p ~p ~p ~p ~n", [Fcount, Fdate, Pcount, Prev]).
-	
 	{tr, [],
-		[{td, [{style, "text-align:right"}], massage(Fcount-Pcount)}, {td, [], massage(Fdate)}]
+		[{td, [{style, "text-align:right"}], massage(Fcount)}, {td, [], massage(Fdate)}]
 	}.
 
-mk_count_lst([First|Rest], Prev) ->
-	[mk_count_lst_o(First,Prev) | mk_count_lst(Rest, First)];
-mk_count_lst([],_) -> [].
+mk_count_lst([H|T]) ->
+	[mk_count_lst_o(H) | mk_count_lst(T)];
+mk_count_lst([]) -> [].
 	
-mk_count_lst_o(First,Prev) ->
+mk_count_lst_o(First) ->
 	{FcountB,_} = First,
 	Fcount=list_to_integer(binary_to_list(FcountB)),
-	{PcountB, _} = Prev,
-	Pcount=list_to_integer(binary_to_list(PcountB)),
-	Fcount-Pcount.
+	Fcount.
 	
 massage({A,B,C}) ->
 	case A > 23 of
