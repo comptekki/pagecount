@@ -25,7 +25,7 @@ Requirements
 -define(USERNAME, "").
 -define(PASSWORD, "").
 
-% YAWS api location
+% YAWS api location (exemple below)
 
 -include("/usr/local/lib/yaws/include/yaws_api.hrl").
 
