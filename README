@@ -14,7 +14,7 @@ Requirements
 
 -define(MAGIC_LINE_NUMBER, 208).
 
-% for brother printer
+% URL for brother printer
 
 -define(URL, "http://192.168.0.1/printer/configu.html?autoref=0&weblang=0").
 
